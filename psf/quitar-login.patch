@@ -1,0 +1,1283 @@
+diff --git a/psf/psf/middleware/auth.js b/psf/psf/middleware/auth.js
+deleted file mode 100644
+index 5c33e3b..0000000
+--- a/psf/psf/middleware/auth.js
++++ /dev/null
+@@ -1,25 +0,0 @@
+-import jwt from 'jsonwebtoken';
+-
+-const JWT_SECRET = process.env.JWT_SECRET;
+-
+-export function verificarToken(req, res, next) {
+-  const header = req.headers.authorization;
+-  if (!header || !header.startsWith('Bearer ')) {
+-    return res.status(401).json({ error: 'No autenticado' });
+-  }
+-  try {
+-    req.usuario = jwt.verify(header.split(' ')[1], JWT_SECRET);
+-    next();
+-  } catch {
+-    return res.status(401).json({ error: 'Token inválido o vencido' });
+-  }
+-}
+-
+-export function verificarRol(...rolesPermitidos) {
+-  return (req, res, next) => {
+-    if (!req.usuario || !rolesPermitidos.includes(req.usuario.rol)) {
+-      return res.status(403).json({ error: 'No tenés permiso para esto' });
+-    }
+-    next();
+-  };
+-}
+\ No newline at end of file
+diff --git a/psf/psf/package-lock.json b/psf/psf/package-lock.json
+index 6a088cb..25979e0 100644
+--- a/psf/psf/package-lock.json
++++ b/psf/psf/package-lock.json
+@@ -9,12 +9,10 @@
+       "version": "0.0.0",
+       "dependencies": {
+         "axios": "^1.19.0",
+-        "bcrypt": "^6.0.0",
+         "cors": "^2.8.6",
+         "dotenv": "^17.4.2",
+         "express": "^5.2.1",
+         "html2pdf.js": "^0.14.0",
+-        "jsonwebtoken": "^9.0.3",
+         "multer": "^2.2.0",
+         "mysql2": "^3.22.5",
+         "pinia": "^3.0.4",
+@@ -535,6 +533,7 @@
+       "version": "1.10.0",
+       "resolved": "https://registry.npmjs.org/@emnapi/core/-/core-1.10.0.tgz",
+       "integrity": "sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==",
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "dependencies": {
+@@ -546,6 +545,7 @@
+       "version": "1.10.0",
+       "resolved": "https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.10.0.tgz",
+       "integrity": "sha512-ewvYlk86xUoGI0zQRNq/mC+16R1QeDlKQy21Ki3oSYXNgLb45GV1P6A0M+/s6nyCuNDqe5VpaY84BzXGwVbwFA==",
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "dependencies": {
+@@ -556,6 +556,7 @@
+       "version": "1.2.1",
+       "resolved": "https://registry.npmjs.org/@emnapi/wasi-threads/-/wasi-threads-1.2.1.tgz",
+       "integrity": "sha512-uTII7OYF+/Mes/MrcIOYp5yOtSMLBWSIoLPpcgwipoiKbli6k322tcoFsxoIIxPDqW01SQGAgko4EzZi2BNv2w==",
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "dependencies": {
+@@ -805,6 +806,7 @@
+       "version": "1.1.5",
+       "resolved": "https://registry.npmjs.org/@napi-rs/wasm-runtime/-/wasm-runtime-1.1.5.tgz",
+       "integrity": "sha512-AWPoBRJ9tsnVhor4sjO7rkni+7p+2IAEFj6cx06UgP10jkQHqay/36uRV/bFkgrh18D9vb4cr8Q0Pthskgzy+Q==",
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "dependencies": {
+@@ -956,9 +958,6 @@
+         "arm64"
+       ],
+       "dev": true,
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -976,9 +975,6 @@
+         "arm64"
+       ],
+       "dev": true,
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -996,9 +992,6 @@
+         "ppc64"
+       ],
+       "dev": true,
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1016,9 +1009,6 @@
+         "riscv64"
+       ],
+       "dev": true,
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1036,9 +1026,6 @@
+         "riscv64"
+       ],
+       "dev": true,
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1056,9 +1043,6 @@
+         "s390x"
+       ],
+       "dev": true,
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1076,9 +1060,6 @@
+         "x64"
+       ],
+       "dev": true,
+-      "libc": [
+-        "glibc"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1096,9 +1077,6 @@
+         "x64"
+       ],
+       "dev": true,
+-      "libc": [
+-        "musl"
+-      ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1190,6 +1168,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1206,6 +1185,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1222,6 +1202,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1238,6 +1219,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1254,6 +1236,7 @@
+       "cpu": [
+         "arm"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1270,9 +1253,7 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1289,9 +1270,7 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1308,9 +1287,7 @@
+       "cpu": [
+         "ppc64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1327,9 +1304,7 @@
+       "cpu": [
+         "s390x"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1346,9 +1321,7 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1365,9 +1338,7 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1384,6 +1355,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1400,6 +1372,7 @@
+       "cpu": [
+         "wasm32"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "dependencies": {
+@@ -1418,6 +1391,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1434,6 +1408,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+@@ -1454,6 +1429,7 @@
+       "version": "0.10.2",
+       "resolved": "https://registry.npmjs.org/@tybys/wasm-util/-/wasm-util-0.10.2.tgz",
+       "integrity": "sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg==",
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "dependencies": {
+@@ -1973,20 +1949,6 @@
+         "node": ">=6.0.0"
+       }
+     },
+-    "node_modules/bcrypt": {
+-      "version": "6.0.0",
+-      "resolved": "https://registry.npmjs.org/bcrypt/-/bcrypt-6.0.0.tgz",
+-      "integrity": "sha512-cU8v/EGSrnH+HnxV2z0J7/blxH8gq7Xh2JFT6Aroax7UohdmiJJlxApMxtKfuI7z68NvvVcmR78k2LbT6efhRg==",
+-      "hasInstallScript": true,
+-      "license": "MIT",
+-      "dependencies": {
+-        "node-addon-api": "^8.3.0",
+-        "node-gyp-build": "^4.8.4"
+-      },
+-      "engines": {
+-        "node": ">= 18"
+-      }
+-    },
+     "node_modules/birpc": {
+       "version": "2.9.0",
+       "resolved": "https://registry.npmjs.org/birpc/-/birpc-2.9.0.tgz",
+@@ -2087,12 +2049,6 @@
+         "node": "^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7"
+       }
+     },
+-    "node_modules/buffer-equal-constant-time": {
+-      "version": "1.0.1",
+-      "resolved": "https://registry.npmjs.org/buffer-equal-constant-time/-/buffer-equal-constant-time-1.0.1.tgz",
+-      "integrity": "sha512-zRpUiDwd/xk6ADqPMATG8vc9VPrkck7T07OIx0gnjmJAnHnTVXNQG3vfvWNuiZIkwu9KrKdA1iJKfsfTVxE6NA==",
+-      "license": "BSD-3-Clause"
+-    },
+     "node_modules/buffer-from": {
+       "version": "1.1.2",
+       "resolved": "https://registry.npmjs.org/buffer-from/-/buffer-from-1.1.2.tgz",
+@@ -2526,15 +2482,6 @@
+         "node": ">= 0.4"
+       }
+     },
+-    "node_modules/ecdsa-sig-formatter": {
+-      "version": "1.0.11",
+-      "resolved": "https://registry.npmjs.org/ecdsa-sig-formatter/-/ecdsa-sig-formatter-1.0.11.tgz",
+-      "integrity": "sha512-nagl3RYrbNv6kQkeJIpt6NJZy8twLB/2vtz6yN9Z4vRKHN4/QZJIEbqohALSgwKdnksuY3k5Addp5lg8sVoVcQ==",
+-      "license": "Apache-2.0",
+-      "dependencies": {
+-        "safe-buffer": "^5.0.1"
+-      }
+-    },
+     "node_modules/ee-first": {
+       "version": "1.1.1",
+       "resolved": "https://registry.npmjs.org/ee-first/-/ee-first-1.1.1.tgz",
+@@ -3123,6 +3070,7 @@
+       "version": "2.3.3",
+       "resolved": "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz",
+       "integrity": "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==",
++      "dev": true,
+       "hasInstallScript": true,
+       "license": "MIT",
+       "optional": true,
+@@ -3582,28 +3530,6 @@
+       "dev": true,
+       "license": "MIT"
+     },
+-    "node_modules/jsonwebtoken": {
+-      "version": "9.0.3",
+-      "resolved": "https://registry.npmjs.org/jsonwebtoken/-/jsonwebtoken-9.0.3.tgz",
+-      "integrity": "sha512-MT/xP0CrubFRNLNKvxJ2BYfy53Zkm++5bX9dtuPbqAeQpTVe0MQTFhao8+Cp//EmJp244xt6Drw/GVEGCUj40g==",
+-      "license": "MIT",
+-      "dependencies": {
+-        "jws": "^4.0.1",
+-        "lodash.includes": "^4.3.0",
+-        "lodash.isboolean": "^3.0.3",
+-        "lodash.isinteger": "^4.0.4",
+-        "lodash.isnumber": "^3.0.3",
+-        "lodash.isplainobject": "^4.0.6",
+-        "lodash.isstring": "^4.0.1",
+-        "lodash.once": "^4.0.0",
+-        "ms": "^2.1.1",
+-        "semver": "^7.5.4"
+-      },
+-      "engines": {
+-        "node": ">=12",
+-        "npm": ">=6"
+-      }
+-    },
+     "node_modules/jspdf": {
+       "version": "4.2.1",
+       "resolved": "https://registry.npmjs.org/jspdf/-/jspdf-4.2.1.tgz",
+@@ -3621,27 +3547,6 @@
+         "html2canvas": "^1.0.0-rc.5"
+       }
+     },
+-    "node_modules/jwa": {
+-      "version": "2.0.1",
+-      "resolved": "https://registry.npmjs.org/jwa/-/jwa-2.0.1.tgz",
+-      "integrity": "sha512-hRF04fqJIP8Abbkq5NKGN0Bbr3JxlQ+qhZufXVr0DvujKy93ZCbXZMHDL4EOtodSbCWxOqR8MS1tXA5hwqCXDg==",
+-      "license": "MIT",
+-      "dependencies": {
+-        "buffer-equal-constant-time": "^1.0.1",
+-        "ecdsa-sig-formatter": "1.0.11",
+-        "safe-buffer": "^5.0.1"
+-      }
+-    },
+-    "node_modules/jws": {
+-      "version": "4.0.1",
+-      "resolved": "https://registry.npmjs.org/jws/-/jws-4.0.1.tgz",
+-      "integrity": "sha512-EKI/M/yqPncGUUh44xz0PxSidXFr/+r0pA70+gIYhjv+et7yxM+s29Y+VGDkovRofQem0fs7Uvf4+YmAdyRduA==",
+-      "license": "MIT",
+-      "dependencies": {
+-        "jwa": "^2.0.1",
+-        "safe-buffer": "^5.0.1"
+-      }
+-    },
+     "node_modules/keyv": {
+       "version": "4.5.4",
+       "resolved": "https://registry.npmjs.org/keyv/-/keyv-4.5.4.tgz",
+@@ -3710,6 +3615,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "MPL-2.0",
+       "optional": true,
+       "os": [
+@@ -3730,6 +3636,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "MPL-2.0",
+       "optional": true,
+       "os": [
+@@ -3750,6 +3657,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "MPL-2.0",
+       "optional": true,
+       "os": [
+@@ -3770,6 +3678,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "MPL-2.0",
+       "optional": true,
+       "os": [
+@@ -3790,6 +3699,7 @@
+       "cpu": [
+         "arm"
+       ],
++      "dev": true,
+       "license": "MPL-2.0",
+       "optional": true,
+       "os": [
+@@ -3810,9 +3720,7 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
++      "dev": true,
+       "license": "MPL-2.0",
+       "optional": true,
+       "os": [
+@@ -3833,9 +3741,7 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
++      "dev": true,
+       "license": "MPL-2.0",
+       "optional": true,
+       "os": [
+@@ -3856,9 +3762,7 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "glibc"
+-      ],
++      "dev": true,
+       "license": "MPL-2.0",
+       "optional": true,
+       "os": [
+@@ -3879,9 +3783,7 @@
+       "cpu": [
+         "x64"
+       ],
+-      "libc": [
+-        "musl"
+-      ],
++      "dev": true,
+       "license": "MPL-2.0",
+       "optional": true,
+       "os": [
+@@ -3902,6 +3804,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "MPL-2.0",
+       "optional": true,
+       "os": [
+@@ -3922,6 +3825,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "MPL-2.0",
+       "optional": true,
+       "os": [
+@@ -3968,48 +3872,6 @@
+         "url": "https://github.com/sponsors/sindresorhus"
+       }
+     },
+-    "node_modules/lodash.includes": {
+-      "version": "4.3.0",
+-      "resolved": "https://registry.npmjs.org/lodash.includes/-/lodash.includes-4.3.0.tgz",
+-      "integrity": "sha512-W3Bx6mdkRTGtlJISOvVD/lbqjTlPPUDTMnlXZFnVwi9NKJ6tiAk6LVdlhZMm17VZisqhKcgzpO5Wz91PCt5b0w==",
+-      "license": "MIT"
+-    },
+-    "node_modules/lodash.isboolean": {
+-      "version": "3.0.3",
+-      "resolved": "https://registry.npmjs.org/lodash.isboolean/-/lodash.isboolean-3.0.3.tgz",
+-      "integrity": "sha512-Bz5mupy2SVbPHURB98VAcw+aHh4vRV5IPNhILUCsOzRmsTmSQ17jIuqopAentWoehktxGd9e/hbIXq980/1QJg==",
+-      "license": "MIT"
+-    },
+-    "node_modules/lodash.isinteger": {
+-      "version": "4.0.4",
+-      "resolved": "https://registry.npmjs.org/lodash.isinteger/-/lodash.isinteger-4.0.4.tgz",
+-      "integrity": "sha512-DBwtEWN2caHQ9/imiNeEA5ys1JoRtRfY3d7V9wkqtbycnAmTvRRmbHKDV4a0EYc678/dia0jrte4tjYwVBaZUA==",
+-      "license": "MIT"
+-    },
+-    "node_modules/lodash.isnumber": {
+-      "version": "3.0.3",
+-      "resolved": "https://registry.npmjs.org/lodash.isnumber/-/lodash.isnumber-3.0.3.tgz",
+-      "integrity": "sha512-QYqzpfwO3/CWf3XP+Z+tkQsfaLL/EnUlXWVkIk5FUPc4sBdTehEqZONuyRt2P67PXAk+NXmTBcc97zw9t1FQrw==",
+-      "license": "MIT"
+-    },
+-    "node_modules/lodash.isplainobject": {
+-      "version": "4.0.6",
+-      "resolved": "https://registry.npmjs.org/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz",
+-      "integrity": "sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==",
+-      "license": "MIT"
+-    },
+-    "node_modules/lodash.isstring": {
+-      "version": "4.0.1",
+-      "resolved": "https://registry.npmjs.org/lodash.isstring/-/lodash.isstring-4.0.1.tgz",
+-      "integrity": "sha512-0wJxfxH1wgO3GrbuP+dTTk7op+6L41QCXbGINEmD+ny/G/eCqGzxyCsh7159S+mgDDcoarnBw6PC1PS5+wUGgw==",
+-      "license": "MIT"
+-    },
+-    "node_modules/lodash.once": {
+-      "version": "4.1.1",
+-      "resolved": "https://registry.npmjs.org/lodash.once/-/lodash.once-4.1.1.tgz",
+-      "integrity": "sha512-Sb487aTOCr9drQVL8pIxOzVhafOjZN9UU54hiN8PU3uAiSV7lx1yYNpbNmex2PK6dSJoNTSJUUswT651yww3Mg==",
+-      "license": "MIT"
+-    },
+     "node_modules/long": {
+       "version": "5.3.2",
+       "resolved": "https://registry.npmjs.org/long/-/long-5.3.2.tgz",
+@@ -4332,26 +4194,6 @@
+         "node": ">= 0.6"
+       }
+     },
+-    "node_modules/node-addon-api": {
+-      "version": "8.9.1",
+-      "resolved": "https://registry.npmjs.org/node-addon-api/-/node-addon-api-8.9.1.tgz",
+-      "integrity": "sha512-4eUQWVPCUUUiBjLnHS3cXWeC6ryoPUc0U3rP7IuzapoGbzMqd/r6KKO0clr0b+snQhsrueFEhCZDdK+LK7hxKg==",
+-      "license": "MIT",
+-      "engines": {
+-        "node": "^18 || ^20 || >= 21"
+-      }
+-    },
+-    "node_modules/node-gyp-build": {
+-      "version": "4.8.4",
+-      "resolved": "https://registry.npmjs.org/node-gyp-build/-/node-gyp-build-4.8.4.tgz",
+-      "integrity": "sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==",
+-      "license": "MIT",
+-      "bin": {
+-        "node-gyp-build": "bin.js",
+-        "node-gyp-build-optional": "optional.js",
+-        "node-gyp-build-test": "build-test.js"
+-      }
+-    },
+     "node_modules/node-releases": {
+       "version": "2.0.47",
+       "resolved": "https://registry.npmjs.org/node-releases/-/node-releases-2.0.47.tgz",
+@@ -5080,6 +4922,7 @@
+       "version": "7.8.4",
+       "resolved": "https://registry.npmjs.org/semver/-/semver-7.8.4.tgz",
+       "integrity": "sha512-rUCObTnP32Q08R2uuIrt7r9PlEonuTmtuXYcW6s5kjdlj3xbnwe+21yXptAUYcMAABLkYYTtnmzb3w3EDZfueA==",
++      "dev": true,
+       "license": "ISC",
+       "bin": {
+         "semver": "bin/semver.js"
+@@ -5401,6 +5244,7 @@
+       "version": "2.8.1",
+       "resolved": "https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz",
+       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==",
++      "dev": true,
+       "license": "0BSD",
+       "optional": true
+     },
+diff --git a/psf/psf/package.json b/psf/psf/package.json
+index 449eac1..c120828 100644
+--- a/psf/psf/package.json
++++ b/psf/psf/package.json
+@@ -13,12 +13,10 @@
+   },
+   "dependencies": {
+     "axios": "^1.19.0",
+-    "bcrypt": "^6.0.0",
+     "cors": "^2.8.6",
+     "dotenv": "^17.4.2",
+     "express": "^5.2.1",
+     "html2pdf.js": "^0.14.0",
+-    "jsonwebtoken": "^9.0.3",
+     "multer": "^2.2.0",
+     "mysql2": "^3.22.5",
+     "pinia": "^3.0.4",
+diff --git a/psf/psf/routes/auth.js b/psf/psf/routes/auth.js
+deleted file mode 100644
+index 10b2bab..0000000
+--- a/psf/psf/routes/auth.js
++++ /dev/null
+@@ -1,33 +0,0 @@
+-import { Router } from 'express';
+-import bcrypt from 'bcrypt';
+-import jwt from 'jsonwebtoken';
+-import { pool } from '../db.js';
+-
+-const router = Router();
+-const JWT_SECRET = process.env.JWT_SECRET;
+-
+-router.post('/login', async (req, res) => {
+-  const { usuario, contrasena } = req.body;
+-  if (!usuario || !contrasena) {
+-    return res.status(400).json({ error: 'Faltan datos' });
+-  }
+-
+-  const [rows] = await pool.query(
+-    'SELECT id, usuario, password, rol FROM usuarios WHERE usuario = ? AND activo = 1',
+-    [usuario]
+-  );
+-  const user = rows[0];
+-  if (!user || !(await bcrypt.compare(contrasena, user.password))) {
+-    return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+-  }
+-
+-  const token = jwt.sign(
+-    { id: user.id, usuario: user.usuario, rol: user.rol },
+-    JWT_SECRET,
+-    { expiresIn: '8h' }
+-  );
+-
+-  res.json({ token, usuario: { id: user.id, usuario: user.usuario, rol: user.rol } });
+-});
+-
+-export default router;
+\ No newline at end of file
+diff --git a/psf/psf/routes/usuarios.js b/psf/psf/routes/usuarios.js
+deleted file mode 100644
+index af92281..0000000
+--- a/psf/psf/routes/usuarios.js
++++ /dev/null
+@@ -1,39 +0,0 @@
+-import { Router } from 'express';
+-import bcrypt from 'bcrypt';
+-import { pool } from '../db.js';
+-import { verificarToken, verificarRol } from '../middleware/auth.js';
+-
+-const router = Router();
+-const ROLES_VALIDOS = ['admin', 'encargado'];
+-
+-router.use(verificarToken, verificarRol('admin'));
+-
+-router.get('/', async (req, res) => {
+-  const [rows] = await pool.query(
+-    'SELECT id, usuario, rol, activo, created_at FROM usuarios ORDER BY id DESC'
+-  );
+-  res.json(rows);
+-});
+-
+-router.post('/', async (req, res) => {
+-  const { usuario, contrasena, rol } = req.body;
+-  if (!usuario || !contrasena || !rol) return res.status(400).json({ error: 'Faltan datos' });
+-  if (!ROLES_VALIDOS.includes(rol)) return res.status(400).json({ error: 'Rol inválido' });
+-
+-  const [existe] = await pool.query('SELECT id FROM usuarios WHERE usuario = ?', [usuario]);
+-  if (existe.length) return res.status(409).json({ error: 'Ese usuario ya existe' });
+-
+-  const hash = await bcrypt.hash(contrasena, 10);
+-  const [result] = await pool.query(
+-    'INSERT INTO usuarios (usuario, password, rol, activo) VALUES (?, ?, ?, 1)',
+-    [usuario, hash, rol]
+-  );
+-  res.status(201).json({ id: result.insertId, usuario, rol });
+-});
+-
+-router.delete('/:id', async (req, res) => {
+-  await pool.query('UPDATE usuarios SET activo = 0 WHERE id = ?', [req.params.id]);
+-  res.json({ ok: true });
+-});
+-
+-export default router;
+\ No newline at end of file
+diff --git a/psf/psf/seed.js b/psf/psf/seed.js
+deleted file mode 100644
+index 0e9dc79..0000000
+--- a/psf/psf/seed.js
++++ /dev/null
+@@ -1,26 +0,0 @@
+-import bcrypt from 'bcrypt';
+-import mysql from 'mysql2/promise';
+-import 'dotenv/config';
+-
+-const pool = mysql.createPool({
+-    host: process.env.DB_HOST,
+-    user: process.env.DB_USER,
+-    password: process.env.DB_PASSWORD,
+-    database: process.env.DB_NAME,
+-});
+-
+-const usuarios = [
+-    { usuario: 'logistica', password: '#Plastico_Sf2026', rol: 'admin' },
+-    { usuario: 'encargados', password: '#Encargados_PsF2026', rol: 'encargado' },
+-];
+-
+-for (const u of usuarios) {
+-    const hash = await bcrypt.hash(u.password, 10);
+-    await pool.query(
+-        'INSERT INTO usuarios (usuario, password, rol) VALUES (?, ?, ?)',
+-        [u.usuario, hash, u.rol]
+-    );
+-    console.log(`Usuario ${u.usuario} creado`);
+-}
+-
+-process.exit(0);
+\ No newline at end of file
+diff --git a/psf/psf/server.js b/psf/psf/server.js
+index 7cc2515..96eb2cc 100644
+--- a/psf/psf/server.js
++++ b/psf/psf/server.js
+@@ -1,8 +1,6 @@
+ import express from 'express';
+ import cors from 'cors';
+ import 'dotenv/config';
+-import authRoutes from './routes/auth.js';
+-import usuariosRoutes from './routes/usuarios.js';
+ 
+ const app = express();
+ const PORT = 3000;
+@@ -10,9 +8,6 @@ const PORT = 3000;
+ app.use(cors());
+ app.use(express.json());
+ 
+-app.use('/api/auth', authRoutes);
+-app.use('/api/usuarios', usuariosRoutes);
+-
+ let productos = [
+     { id: 1, nombre: 'Paleta de Padel', precio: 150 },
+     { id: 2, nombre: 'Tubo de Pelotas', precio: 12 }
+diff --git a/psf/psf/src/App.vue b/psf/psf/src/App.vue
+index 1a64024..72c4370 100644
+--- a/psf/psf/src/App.vue
++++ b/psf/psf/src/App.vue
+@@ -2,19 +2,10 @@
+ // node src/serverSQL.js
+ 
+ import { onMounted, ref, watch } from 'vue'
+-import { RouterLink, RouterView, useRouter } from 'vue-router'
+-import { useAuthStore } from '@/stores/auth'
+-
+-const auth = useAuthStore()
+-const router = useRouter()
++import { RouterLink, RouterView } from 'vue-router'
+ 
+ const modoOscuro = ref(false)
+ 
+-function cerrarSesion() {
+-  auth.logout()
+-  router.push('/login')
+-}
+-
+ watch(modoOscuro, (activo) => {
+   document.documentElement.classList.toggle('dark', activo)
+   document.documentElement.setAttribute('data-bs-theme', activo ? 'dark' : 'light')
+@@ -37,8 +28,8 @@ watch(modoOscuro, (activo) => {
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+ 
+-  <div class="app-layout" :class="{ 'sin-sidebar': !auth.isAuthenticated }">
+-    <header v-if="auth.isAuthenticated" class="no-print">
++  <div class="app-layout">
++    <header class="no-print">
+       <img alt="Vue logo" src="./assets/logopsf.png"/>
+       <div class="modo_osc_cla">
+         <i
+@@ -59,33 +50,19 @@ watch(modoOscuro, (activo) => {
+           <i class="bi bi-receipt"></i>
+           <span>Comanda</span>
+         </RouterLink>
+-        <RouterLink v-if="auth.isAdmin" to="/clientes" class="tab">
++        <RouterLink to="/clientes" class="tab">
+           <i class="bi bi-person-lines-fill"></i>
+           <span>Clientes</span>
+         </RouterLink>
+-        <RouterLink v-if="auth.isAdmin" to="/produ" class="tab">
++        <RouterLink to="/produ" class="tab">
+           <i class="bi bi-box-seam"></i>
+           <span>Productos</span>
+         </RouterLink>
+-        <RouterLink v-if="auth.isAdmin" to="/calcu" class="tab">
++        <RouterLink to="/calcu" class="tab">
+           <i class="bi bi-calculator-fill"></i>
+           <span>Calculadora</span>
+         </RouterLink>
+       </nav>
+-
+-      <div class="user-box">
+-        <div class="user-info">
+-          <i class="bi bi-person-circle"></i>
+-          <div class="user-text">
+-            <span class="user-name">{{ auth.username }}</span>
+-            <span class="user-role">{{ auth.label }}</span>
+-          </div>
+-        </div>
+-        <button class="logout-btn" type="button" @click="cerrarSesion">
+-          <i class="bi bi-box-arrow-right"></i>
+-          <span>Salir</span>
+-        </button>
+-      </div>
+     </header>
+ 
+     <main class="app-content">
+@@ -185,71 +162,6 @@ nav {
+   min-width: 0;
+ }
+ 
+-.app-layout.sin-sidebar {
+-  align-items: stretch;
+-}
+-
+-.user-box {
+-  margin-top: auto;
+-  padding: 1rem 1.2rem 0 1.2rem;
+-  border-top: 1px solid var(--color-borde-suave);
+-}
+-
+-.user-info {
+-  display: flex;
+-  align-items: center;
+-  gap: 0.6rem;
+-  margin-bottom: 0.7rem;
+-}
+-
+-.user-info i {
+-  font-size: 1.6rem;
+-  color: var(--color-acento);
+-}
+-
+-.user-text {
+-  display: flex;
+-  flex-direction: column;
+-  line-height: 1.2;
+-  min-width: 0;
+-}
+-
+-.user-name {
+-  font-size: 0.9rem;
+-  font-weight: 600;
+-  color: var(--color-texto);
+-  overflow: hidden;
+-  text-overflow: ellipsis;
+-  white-space: nowrap;
+-}
+-
+-.user-role {
+-  font-size: 0.75rem;
+-  color: var(--color-texto-muted);
+-}
+-
+-.logout-btn {
+-  display: flex;
+-  align-items: center;
+-  justify-content: center;
+-  gap: 0.5rem;
+-  width: 100%;
+-  padding: 0.5rem 0.8rem;
+-  background-color: transparent;
+-  border: 1px solid var(--color-borde-suave);
+-  border-radius: 6px;
+-  color: var(--color-texto-suave);
+-  font-size: 0.85rem;
+-  cursor: pointer;
+-  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+-}
+-
+-.logout-btn:hover {
+-  background-color: var(--color-fondo-hover);
+-  color: var(--color-acento-hover);
+-  border-color: var(--color-acento-hover);
+-}
+-
+ @media print {
+   .no-print {
+     display: none !important;
+diff --git a/psf/psf/src/router/index.js b/psf/psf/src/router/index.js
+index d2e22c2..f8e8ff4 100644
+--- a/psf/psf/src/router/index.js
++++ b/psf/psf/src/router/index.js
+@@ -3,86 +3,31 @@ import Comanda from '@/views/comanda.vue'
+ import Produ from '@/views/produ.vue'
+ import Clientes from '@/views/clientes.vue'
+ import calculadora from '@/views/calculadora.vue'
+-import Login from '@/views/login.vue'
+-import { useAuthStore } from '@/stores/auth'
+ 
+ const router = createRouter({
+   history: createWebHistory(import.meta.env.BASE_URL),
+   routes: [
+-    {
+-      path: '/login',
+-      name: 'login',
+-      component: Login,
+-      meta: { public: true },
+-    },
+     {
+       path: '/',
+       name: 'comanda',
+       component: Comanda,
+-      meta: { roles: ['admin', 'encargado'] },
+     },
+     {
+       path: '/produ',
+       name: 'produ',
+       component: Produ,
+-      meta: { roles: ['admin'] },
+     },
+     {
+       path: '/clientes',
+       name: 'clientes',
+       component: Clientes,
+-      meta: { roles: ['admin'] },
+     },
+     {
+       path: '/calcu',
+       name: 'calcu',
+       component: calculadora,
+-      meta: { roles: ['admin'] },
+     },
+   ],
+ })
+ 
+-router.beforeEach((to) => {
+-  const auth = useAuthStore()
+-
+-  // Ruta pública (login): si ya está logueado, lo mandamos al home
+-  if (to.meta.public) {
+-    if (auth.estaLogueado && to.name === 'login') {
+-      return { path: '/' }
+-    }
+-    return true
+-  }
+-
+-  // No logueado -> redirige a login, guardando a dónde quería ir
+-  if (!auth.estaLogueado) {
+-    return { path: '/login', query: { redirect: to.fullPath } }
+-  }
+-
+-  // Logueado pero sin permiso para esta ruta -> lo manda a Comanda
+-  const rolesPermitidos = to.meta.roles || []
+-  if (rolesPermitidos.length && !rolesPermitidos.includes(auth.rol)) {
+-    return { path: '/' }
+-  }
+-
+-  return true
+-})
+-
+ export default router
+-
+-const SECCIONES_POR_ROL = {
+-  admin: ['dashboard', 'usuarios', 'inventario', 'pedidos', 'reportes'],
+-  encargado: ['dashboard', 'inventario', 'pedidos'],
+-};
+-
+-// en las rutas: meta: { requiresAuth: true, seccion: 'usuarios' }
+-
+-router.beforeEach((to) => {
+-  const auth = useAuthStore();
+-
+-  if (to.meta.requiresAuth && !auth.estaLogueado) {
+-    return { path: '/login', query: { redirect: to.fullPath } };
+-  }
+-  if (to.meta.seccion && !SECCIONES_POR_ROL[auth.rol]?.includes(to.meta.seccion)) {
+-    return { path: '/no-autorizado' };
+-  }
+-});
+\ No newline at end of file
+diff --git a/psf/psf/src/serverSQL.js b/psf/psf/src/serverSQL.js
+index f0582fb..d9186a3 100644
+--- a/psf/psf/src/serverSQL.js
++++ b/psf/psf/src/serverSQL.js
+@@ -8,16 +8,12 @@ import fs from 'fs/promises';
+ import path from 'path';
+ import multer from 'multer';
+ import os from 'os';
+-import authRoutes from '../routes/auth.js';
+-import usuariosRoutes from '../routes/usuarios.js';
+  
+ const app = express();
+ const PORT = 3000;
+ 
+ app.use(cors());
+ app.use(express.json());
+-app.use('/api/auth', authRoutes);
+-app.use('/api/usuarios', usuariosRoutes);
+ 
+ // Conexión usando variables de entorno
+ const pool = mysql.createPool({
+@@ -37,15 +33,6 @@ await fs.mkdir(PDF_DIR, { recursive: true });
+ 
+ const upload = multer({ dest: PDF_DIR });
+ 
+-app.get('/usuarios', async (_req, res) => {
+-    try {
+-        const [rows] = await pool.query('SELECT id, usuario, rol, activo FROM usuarios');
+-        res.json(rows);
+-    } catch (error) {
+-        res.status(500).json({ error: 'Error al obtener los usuarios' });
+-    }
+-});
+-
+ app.get('/productospsf/:codigo', async (req, res) => {
+     try {
+         const { codigo } = req.params;
+diff --git a/psf/psf/src/stores/auth.js b/psf/psf/src/stores/auth.js
+deleted file mode 100644
+index c5c11a8..0000000
+--- a/psf/psf/src/stores/auth.js
++++ /dev/null
+@@ -1,45 +0,0 @@
+-import { defineStore } from 'pinia';
+-import axios from 'axios';
+-
+-export const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
+-
+-api.interceptors.request.use((config) => {
+-  const token = localStorage.getItem('token');
+-  if (token) config.headers.Authorization = `Bearer ${token}`;
+-  return config;
+-});
+-
+-export const useAuthStore = defineStore('auth', {
+-  state: () => ({
+-    token: localStorage.getItem('token') || null,
+-    usuario: JSON.parse(localStorage.getItem('usuario') || 'null'),
+-  }),
+-  getters: {
+-    estaLogueado: (state) => !!state.token,
+-    isAuthenticated: (state) => !!state.token,
+-    rol: (state) => state.usuario?.rol || null,
+-    isAdmin: (state) => state.usuario?.rol === 'admin',
+-    username: (state) => state.usuario?.usuario || '',
+-    label: (state) => (state.usuario?.rol === 'admin' ? 'Administrador' : 'Encargado'),
+-  },
+-  actions: {
+-    async login(usuario, contrasena) {
+-      try {
+-        const { data } = await api.post('/auth/login', { usuario, contrasena });
+-        this.token = data.token;
+-        this.usuario = data.usuario;
+-        localStorage.setItem('token', data.token);
+-        localStorage.setItem('usuario', JSON.stringify(data.usuario));
+-        return true;
+-      } catch {
+-        return false;
+-      }
+-    },
+-    logout() {
+-      this.token = null;
+-      this.usuario = null;
+-      localStorage.removeItem('token');
+-      localStorage.removeItem('usuario');
+-    },
+-  },
+-});
+\ No newline at end of file
+diff --git a/psf/psf/src/views/login.vue b/psf/psf/src/views/login.vue
+deleted file mode 100644
+index dd4dc50..0000000
+--- a/psf/psf/src/views/login.vue
++++ /dev/null
+@@ -1,178 +0,0 @@
+-<script setup>
+-import { ref } from 'vue'
+-import { useRouter, useRoute } from 'vue-router'
+-import { useAuthStore } from '@/stores/auth'
+-
+-const usuario = ref('')
+-const contrasena = ref('')
+-const mostrarPassword = ref(false)
+-const error = ref('')
+-const cargando = ref(false)
+-
+-const auth = useAuthStore()
+-const router = useRouter()
+-const route = useRoute()
+-
+-async function ingresar() {
+-  error.value = ''
+-
+-  if (!usuario.value.trim() || !contrasena.value) {
+-    error.value = 'Ingresá usuario y contraseña.'
+-    return
+-  }
+-
+-  cargando.value = true
+-  const ok = await auth.login(usuario.value.trim(), contrasena.value)
+-  cargando.value = false
+-
+-  if (!ok) {
+-    error.value = 'Usuario o contraseña incorrectos.'
+-    contrasena.value = ''
+-    return
+-  }
+-
+-  const destino = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
+-  router.replace(destino)
+-}
+-</script>
+-
+-<template>
+-  <div class="login-page">
+-    <div class="login-card">
+-      <img src="../assets/logopsf.png" alt="Logo" class="login-logo" />
+-      <h1>Iniciar sesión</h1>
+-      <p class="subtitle">Ingresá tus credenciales para continuar</p>
+-
+-      <form @submit.prevent="ingresar" novalidate>
+-        <div class="mb-3 text-start">
+-          <label class="form-label" for="usuario">Usuario</label>
+-          <input
+-            id="usuario"
+-            v-model="usuario"
+-            type="text"
+-            class="form-control"
+-            placeholder="Usuario"
+-            autocomplete="username"
+-            autofocus
+-          />
+-        </div>
+-
+-        <div class="mb-3 text-start">
+-          <label class="form-label" for="contrasena">Contraseña</label>
+-          <div class="input-group">
+-            <input
+-              id="contrasena"
+-              v-model="contrasena"
+-              :type="mostrarPassword ? 'text' : 'password'"
+-              class="form-control"
+-              placeholder="Contraseña"
+-              autocomplete="current-password"
+-            />
+-            <button
+-              type="button"
+-              class="btn btn-outline-secondary"
+-              tabindex="-1"
+-              @click="mostrarPassword = !mostrarPassword"
+-            >
+-              <i :class="mostrarPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+-            </button>
+-          </div>
+-        </div>
+-
+-        <div v-if="error" class="alert alert-danger py-2 mb-3">
+-          {{ error }}
+-        </div>
+-
+-        <button type="submit" class="btn btn-danger w-100" :disabled="cargando">
+-          <span v-if="cargando" class="spinner-border spinner-border-sm me-2" role="status"></span>
+-          Ingresar
+-        </button>
+-      </form>
+-    </div>
+-  </div>
+-</template>
+-
+-<style scoped>
+-.login-page {
+-  min-height: 100vh;
+-  width: 100%;
+-  display: flex;
+-  align-items: center;
+-  justify-content: center;
+-  background: linear-gradient(135deg, #f2f2f2 0%, #e6e6e6 100%);
+-  padding: 1rem;
+-}
+-
+-.login-card {
+-  background: #ffffff;
+-  border-radius: 14px;
+-  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.1);
+-  padding: 2.5rem 2.25rem;
+-  width: 100%;
+-  max-width: 380px;
+-  text-align: center;
+-}
+-
+-.login-logo {
+-  width: 80%;
+-  height: auto;
+-  margin: 0 auto 1.25rem auto;
+-  display: block;
+-}
+-
+-h1 {
+-  font-size: 1.35rem;
+-  margin-bottom: 0.25rem;
+-  color: #333333;
+-  font-weight: 700;
+-}
+-
+-.subtitle {
+-  color: #808080;
+-  font-size: 0.88rem;
+-  margin-bottom: 1.75rem;
+-}
+-
+-.form-label {
+-  font-size: 0.85rem;
+-  color: #464646;
+-  margin-bottom: 0.3rem;
+-}
+-
+-.btn-danger {
+-  background-color: #a60808;
+-  border-color: #a60808;
+-}
+-
+-.btn-danger:hover,
+-.btn-danger:focus {
+-  background-color: #870606;
+-  border-color: #870606;
+-}
+-
+-.btn-danger:disabled {
+-  background-color: #c46f6f;
+-  border-color: #c46f6f;
+-}
+-
+-html.dark .login-page {
+-  background: linear-gradient(135deg, #141414 0%, #1e1e1e 100%);
+-}
+-
+-html.dark .login-card {
+-  background: #1e1e1e;
+-  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.5);
+-}
+-
+-html.dark h1 {
+-  color: #eeeeee;
+-}
+-
+-html.dark .subtitle {
+-  color: #999999;
+-}
+-
+-html.dark .form-label {
+-  color: #cccccc;
+-}
+-</style>

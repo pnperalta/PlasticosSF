@@ -1,0 +1,40 @@
+{
+  "numero": "9016",
+  "fecha": "4/8/2026",
+  "codigoCliente": 28,
+  "razonSocial": "CAVALLO  EDUARDO JORGE",
+  "vendedor": "HECTOR",
+  "etiqueta": "PSF",
+  "grupos": [
+    {
+      "filas": [
+        {
+          "id": "e488776f-43c8-466e-80f0-ddb3088407e0",
+          "codigoProducto": 8000,
+          "cantidad": 20,
+          "tipo": "REFORZADA INT. BLANCO",
+          "medida": "1/2 X 15 MT.",
+          "peso": 1.5,
+          "buscando": false,
+          "error": ""
+        },
+        {
+          "id": "8ab61230-c2a9-4a39-8b01-89d01cf304b8",
+          "codigoProducto": 4000,
+          "cantidad": 30,
+          "tipo": "CAŃO HIDROCARBURO",
+          "medida": "AZUL 4 X 8",
+          "peso": 2.15,
+          "buscando": false,
+          "error": ""
+        }
+      ],
+      "obs": "Violeta",
+      "diaFecha": 28,
+      "mesFecha": 7,
+      "ordenCompra": "600",
+      "posicion": null,
+      "total": null
+    }
+  ]
+}
