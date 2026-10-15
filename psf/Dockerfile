@@ -38,6 +38,7 @@ COPY --from=builder /app/dist ./dist
 COPY src ./src
 COPY routes ./routes
 COPY db.js ./db.js
+COPY psf.sql ./psf.sql
 
 # Crear carpetas para almacenamiento de comandas y backups
 RUN mkdir -p /app/backups /app/backups-pdf

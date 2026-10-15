@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 -- Estructura de tabla para la tabla `clientespsf`
 --
 
-CREATE TABLE `clientespsf` (
+CREATE TABLE IF NOT EXISTS `clientespsf` (
   `codigoc` int(10) NOT NULL,
   `razonsocial` varchar(50) NOT NULL,
   `etiquetas` varchar(100) NOT NULL,
@@ -585,7 +585,7 @@ INSERT INTO `clientespsf` (`codigoc`, `razonsocial`, `etiquetas`, `vendedor`) VA
 -- Estructura de tabla para la tabla `productospsf`
 --
 
-CREATE TABLE `productospsf` (
+CREATE TABLE IF NOT EXISTS `productospsf` (
   `codigop` varchar(10) NOT NULL,
   `tipo` varchar(150) NOT NULL,
   `medida` varchar(100) NOT NULL,

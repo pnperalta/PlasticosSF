@@ -39,7 +39,8 @@ export const pool = mysql.createPool({
     password: process.env.DB_PASSWORD || 'psf_password',
     database: process.env.DB_NAME || 'psf',
     waitForConnections: true,
-    connectionLimit: 10
+    connectionLimit: 10,
+    multipleStatements: true
 });
 
 // Directorios para backups (configurables por variable de entorno)
@@ -288,6 +289,84 @@ app.post(['/comandas/backup-pdf', '/api/comandas/backup-pdf'], upload.single('pd
 });
 
 // ==========================================
+// AUTO-IMPORTACIÓN Y ENDPOINT ADMINISTRATIVO
+// ==========================================
+app.all('/api/admin/import-sql', async (_req, res) => {
+    try {
+        const connection = await pool.getConnection();
+        const possiblePaths = [
+            path.resolve('./psf.sql'),
+            path.resolve(__dirname, '../psf.sql'),
+            path.resolve(__dirname, '../../psf.sql'),
+            path.resolve('./init-db/02-psf.sql')
+        ];
+        let sqlFile = null;
+        for (const p of possiblePaths) {
+            try {
+                await fs.access(p);
+                sqlFile = p;
+                break;
+            } catch {}
+        }
+        if (!sqlFile) {
+            connection.release();
+            return res.status(404).json({ error: 'Archivo psf.sql no encontrado en el servidor' });
+        }
+        const sqlContent = await fs.readFile(sqlFile, 'utf-8');
+        await connection.query(sqlContent);
+        const [cRows] = await connection.query('SELECT COUNT(*) AS total FROM clientespsf');
+        const [pRows] = await connection.query('SELECT COUNT(*) AS total FROM productospsf');
+        connection.release();
+        res.json({
+            status: 'success',
+            message: 'Base de datos importada exitosamente desde psf.sql.',
+            clientes: cRows[0].total,
+            productos: pRows[0].total
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+async function seedDatabaseIfEmpty(connection) {
+    try {
+        const [rows] = await connection.query('SELECT COUNT(*) AS total FROM clientespsf');
+        if (rows[0].total === 0) {
+            console.log('🔄 Tabla clientespsf vacía. Buscando psf.sql para inicializar datos...');
+            const possiblePaths = [
+                path.resolve('./psf.sql'),
+                path.resolve(__dirname, '../psf.sql'),
+                path.resolve(__dirname, '../../psf.sql'),
+                path.resolve('./init-db/02-psf.sql')
+            ];
+            let sqlFile = null;
+            for (const p of possiblePaths) {
+                try {
+                    await fs.access(p);
+                    sqlFile = p;
+                    break;
+                } catch {}
+            }
+
+            if (sqlFile) {
+                console.log(`📂 Leyendo archivo para inicialización: ${sqlFile}`);
+                const sqlContent = await fs.readFile(sqlFile, 'utf-8');
+                await connection.query(sqlContent);
+                const [cRows] = await connection.query('SELECT COUNT(*) AS total FROM clientespsf');
+                const [pRows] = await connection.query('SELECT COUNT(*) AS total FROM productospsf');
+                console.log(`✅ Base de datos inicializada: ${cRows[0].total} clientes y ${pRows[0].total} productos cargados.`);
+            } else {
+                console.warn('⚠️ No se encontró el archivo psf.sql para auto-importar.');
+            }
+        } else {
+            console.log(`ℹ️ La base de datos ya contiene ${rows[0].total} clientes. Omitiendo importación.`);
+        }
+    } catch (err) {
+        console.error('❌ Error al inicializar datos desde psf.sql:', err.message);
+    }
+}
+
+// ==========================================
 // ARCHIVOS ESTÁTICOS Y ENRUTAMIENTO SPA
 // ==========================================
 app.use(express.static(distPath));
@@ -358,8 +437,9 @@ async function initDB() {
                     PRIMARY KEY (id)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
             `);
-            connection.release();
             console.log('✅ Estructura de tablas verificada.');
+            await seedDatabaseIfEmpty(connection);
+            connection.release();
             break;
         } catch (err) {
             retries--;
