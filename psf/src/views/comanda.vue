@@ -3,6 +3,7 @@
 
 import { reactive, ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import html2pdf from 'html2pdf.js'
+import { API_URL } from '@/config.js'
 
 const comanda = reactive({
   codigoCliente: '',
@@ -69,7 +70,7 @@ async function buscarCliente() {
 
   clienteInfo.buscando = true
   try {
-    const res = await fetch(`http://localhost:3000/clientes/${codigo}`)
+    const res = await fetch(`${API_URL}/clientes/${codigo}`)
 
     if (!res.ok) {
       clienteInfo.error = res.status === 404 ? 'Cliente no encontrado.' : 'Error al buscar el cliente.'
@@ -426,7 +427,7 @@ async function buscarProductoFila(fila) {
 
   fila.buscando = true
   try {
-    const res = await fetch(`http://localhost:3000/productospsf/${fila.codigoProducto}`)
+    const res = await fetch(`${API_URL}/productospsf/${fila.codigoProducto}`)
 
     if (!res.ok) {
       fila.error = res.status === 404 ? 'Producto no encontrado.' : 'Error al buscar el producto.'
@@ -483,7 +484,7 @@ async function calcularProducto() {
   resultadoCalculo.error = ''
 
   try {
-    const res = await fetch(`http://localhost:3000/productospsf/${calculo.codigoProducto}`)
+    const res = await fetch(`${API_URL}/productospsf/${calculo.codigoProducto}`)
 
     if (!res.ok) {
       resultadoCalculo.error = res.status === 404 ? 'Producto no encontrado.' : 'Error al buscar el producto.'
@@ -660,7 +661,7 @@ async function imprimir() {
 
 async function guardarBackupComanda() {
   try {
-    await fetch('http://localhost:3000/comandas/backup', {
+    await fetch(`${API_URL}/comandas/backup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -707,7 +708,7 @@ async function guardarPdfComanda(blobPdf) {
   formData.append('pdf', blobPdf, nombreArchivo)
 
   try {
-    const res = await fetch('http://localhost:3000/comandas/backup-pdf', {
+    const res = await fetch(`${API_URL}/comandas/backup-pdf`, {
       method: 'POST',
       body: formData
     })

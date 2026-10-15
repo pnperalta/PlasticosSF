@@ -2,6 +2,7 @@
 // node src/serverSQL.js
 
 import { ref, reactive, computed } from 'vue'
+import { API_URL } from '@/config.js'
 
 const clientes = ref([])
 const mostrandoClientes = ref(false)
@@ -46,7 +47,7 @@ async function guardarEdicionCliente() {
   const { codigoc, etiquetas } = editandoCliente.value // etiqueta VIEJA (para ubicar la fila)
   cargando.value = true
   try {
-    const res = await fetch(`http://localhost:3000/clientes/${codigoc}/${etiquetas}`, {
+    const res = await fetch(`${API_URL}/clientes/${codigoc}/${etiquetas}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -91,7 +92,7 @@ async function toggleMostrarClientes() {
   cargando.value = true
 
   try {
-    const res = await fetch('http://localhost:3000/clientes')
+    const res = await fetch(`${API_URL}/clientes`)
 
     if (!res.ok) throw new Error('Error al obtener los clientes')
 
@@ -118,7 +119,7 @@ async function agregarCliente() {
   cargando.value = true
 
   try {
-    const res = await fetch('http://localhost:3000/clientes', {
+    const res = await fetch(`${API_URL}/clientes`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...nuevoCliente })

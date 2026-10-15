@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "start": "node src/serverSQL.js",
+    "server": "node src/serverSQL.js",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",

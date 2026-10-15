@@ -2,6 +2,7 @@
 // node src/serverSQL.js
 
 import { ref, reactive, computed } from 'vue'
+import { API_URL } from '@/config.js'
  
 const productos = ref([])
 const mostrandoProductos = ref(false)
@@ -39,7 +40,7 @@ function cancelarEdicion() {
 async function guardarEdicion(codigo) {
   cargando.value = true
   try {
-    const res = await fetch(`http://localhost:3000/productospsf/${codigo}`, {
+    const res = await fetch(`${API_URL}/productospsf/${codigo}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tipo: edicion.tipo, medida: edicion.medida, peso: edicion.peso })
@@ -80,7 +81,7 @@ async function toggleMostrarProductos() {
   cargando.value = true
 
   try {
-    const res = await fetch('http://localhost:3000/productospsf')
+    const res = await fetch(`${API_URL}/productospsf`)
 
     if (!res.ok) throw new Error('Error al obtener los productos')
 
@@ -107,7 +108,7 @@ async function agregarProducto() {
   cargando.value = true
 
   try {
-    const res = await fetch('http://localhost:3000/productospsf', {
+    const res = await fetch(`${API_URL}/productospsf`, {
     method: 'POST',
    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...nuevoProducto })

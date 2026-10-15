@@ -15,4 +15,12 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  server: {
+    proxy: {
+      '/clientes': 'http://localhost:3000',
+      '/productospsf': 'http://localhost:3000',
+      '/comandas': 'http://localhost:3000',
+      '/api': 'http://localhost:3000',
+    }
+  }
 })

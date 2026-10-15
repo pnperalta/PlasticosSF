@@ -1,0 +1,56 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME:-psf}
+      - DB_USER=${DB_USER:-psf}
+      - DB_PASSWORD=${DB_PASSWORD:-psf_password}
+      - BACKUP_DIR=/app/backups
+      - PDF_DIR=/app/backups-pdf
+    volumes:
+      - app_backups:/app/backups
+      - app_backups_pdf:/app/backups-pdf
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    labels:
+      - "coolify.managed=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.plasticos-app.rule=Host(`plasticos.sandboxtest.online`)"
+      - "traefik.http.routers.plasticos-app.entrypoints=websecure"
+      - "traefik.http.routers.plasticos-app.tls=true"
+      - "traefik.http.routers.plasticos-app.tls.certresolver=letsencrypt"
+      - "traefik.http.services.plasticos-app.loadbalancer.server.port=3000"
+
+  db:
+    image: mariadb:10.4
+    restart: always
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root_password}
+      - MYSQL_DATABASE=${DB_NAME:-psf}
+      - MYSQL_USER=${DB_USER:-psf}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-psf_password}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root_password}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  db_data:
+  app_backups:
+  app_backups_pdf:

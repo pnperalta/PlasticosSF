@@ -2,6 +2,7 @@
 // node src/serverSQL.js
 
 import { reactive, ref, nextTick, computed, onMounted, onUnmounted } from 'vue'
+import { API_URL } from '@/config.js'
  
 const TOTAL_FILAS = 20
 
@@ -52,7 +53,7 @@ async function buscarProducto(idx) {
   fila.error = ''
 
   try {
-    const res = await fetch(`http://localhost:3000/productospsf/${fila.codigo}`)
+    const res = await fetch(`${API_URL}/productospsf/${fila.codigo}`)
 
     if (!res.ok) {
       fila.error = res.status === 404 ? 'No encontrado' : 'Error'
