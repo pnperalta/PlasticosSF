@@ -61,11 +61,18 @@ git push origin main
 
 ---
 
-## 4. Verificación y DNS
+## 4. Configuración con tus DNS de Cloudflare
 
-1. Asegúrate de que el registro DNS de `plasticos.sandboxtest.online` apunte a la IP pública de tu servidor Coolify:
-   - Tipo: `A`
-   - Nombre / Host: `plasticos`
-   - Valor: `<IP_DE_TU_SERVIDOR_COOLIFY>`
-2. Una vez desplegado, Coolify gestionará automáticamente el certificado SSL (Let's Encrypt).
-3. Entra a `https://plasticos.sandboxtest.online` en tu navegador.
+Viendo tu panel de Cloudflare:
+- Ya tienes configurado un **Cloudflare Tunnel** (`Plasticos`).
+- Tienes el comodín `*.sandboxtest.online` apuntando a dicho túnel.
+
+### Pasos en Cloudflare Zero Trust (Túnel "Plasticos"):
+1. Entra a tu dashboard de **Cloudflare Zero Trust** -> **Networks** -> **Tunnels**.
+2. Entra al túnel **`Plasticos`** y ve a la pestaña **Public Hostnames**.
+3. Haz clic en **Add a public hostname**:
+   - **Subdomain**: `plasticos`
+   - **Domain**: `sandboxtest.online`
+   - **Type**: `HTTP`
+   - **URL**: `localhost:80` (o la IP local del servidor de Coolify con el puerto de Traefik, exactamente igual a como tienes configurado `coolify.sandboxtest.online`).
+4. Guarda los cambios. ¡Listo! Cloudflare se encargará de enrutar el tráfico seguro SSL hacia Coolify.

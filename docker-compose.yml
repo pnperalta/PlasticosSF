@@ -20,16 +20,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    expose:
+      - "3000"
     ports:
       - "3000:3000"
     labels:
       - "coolify.managed=true"
-      - "traefik.enable=true"
-      - "traefik.http.routers.plasticos-app.rule=Host(`plasticos.sandboxtest.online`)"
-      - "traefik.http.routers.plasticos-app.entrypoints=websecure"
-      - "traefik.http.routers.plasticos-app.tls=true"
-      - "traefik.http.routers.plasticos-app.tls.certresolver=letsencrypt"
-      - "traefik.http.services.plasticos-app.loadbalancer.server.port=3000"
 
   db:
     image: mariadb:10.4
