@@ -134,7 +134,7 @@ const productosCargados = computed(() =>
 <template>
     <div class="calcu-app">
         <header class="app-header">
-            <h1 class="titulo-principal" style="margin-top: 1%;">Calculadora HOLA</h1>
+            <h1 class="titulo-principal" style="margin-top: 1%;">Calculadora</h1>
         </header>
         <div class="atajos-flotante">
           <p class="atajos-titulo">Atajos</p>
