@@ -226,11 +226,14 @@ onMounted(() => {
   font-family: var(--font-body);
   color: var(--ink);
   background: var(--bg);
-  padding: 1.5rem 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
   width: 100%;
+  min-height: 100vh;
+  padding-block: 1.5rem 3rem;
+  /* equivale a max-width 1200px centrado, pero con el fondo a todo el ancho */
+  padding-inline: max(2rem, calc((100% - 1200px) / 2 + 2rem));
+  box-sizing: border-box;
 }
+
 
 html.dark .historial-app {
   --ink: #d6d6d6;
