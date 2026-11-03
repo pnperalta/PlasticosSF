@@ -193,11 +193,55 @@ onMounted(() => {
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap');
+
 .historial-app {
+  /* Paleta y fuentes (igual que Productos) */
+  --ink: #221f1e;
+  --ink-soft: #6e6360;
+  --surface: #ffffff;
+  --bg: #f2efee;
+  --line: #ddd6d4;
+  --accent: #c1272d;
+  --accent-dark: #8c1b1f;
+  --accent-soft: #f7e6e5;
+  --shadow: 0 1px 2px rgba(34, 31, 30, 0.07), 0 10px 30px -14px rgba(34, 31, 30, 0.26);
+  --font-display: 'Barlow Semi Condensed', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Alias: las variables que ya usaba Historial apuntan a la nueva paleta */
+  --color-texto: var(--ink);
+  --color-texto-muted: var(--ink-soft);
+  --color-texto-suave: var(--ink-soft);
+  --color-borde: var(--line);
+  --color-borde-suave: var(--line);
+  --color-fondo: var(--bg);
+  --color-fondo-panel: var(--surface);
+  --color-fondo-hover: var(--accent-soft);
+  --color-acento: var(--accent);
+  --color-acento-hover: var(--accent-dark);
+  --sombra: var(--shadow);
+
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--bg);
   padding: 1.5rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+}
+
+html.dark .historial-app {
+  --ink: #d6d6d6;
+  --ink-soft: #a4a4a4;
+  --surface: #1e1e1e;
+  --bg: #141414;
+  --line: #333333;
+  --accent: #ff6b6b;
+  --accent-dark: #ff8787;
+  --accent-soft: #3a1f1f;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px -14px rgba(0, 0, 0, 0.6);
 }
 
 .historial-header {
@@ -212,6 +256,7 @@ onMounted(() => {
 }
 
 .titulo-principal {
+  font-family: var(--font-display);
   font-size: 1.85rem;
   font-weight: 700;
   color: var(--color-texto);
@@ -236,10 +281,11 @@ onMounted(() => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.55rem 1.1rem;
-  background: var(--color-fondo-panel);
+  background: var(--surface);
   color: var(--color-texto);
   border: 1px solid var(--color-borde);
   border-radius: 8px;
+  font-family: var(--font-display);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -248,7 +294,7 @@ onMounted(() => {
 
 .btn-actualizar:hover:not(:disabled) {
   border-color: var(--color-acento);
-  color: var(--color-acento);
+  color: var(--color-acento-hover);
   background: var(--color-fondo-hover);
 }
 
@@ -272,7 +318,7 @@ onMounted(() => {
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
-  background: var(--color-fondo-panel);
+  background: var(--surface);
   border: 1px solid var(--color-borde);
   border-radius: 10px;
   padding: 0.85rem 1.2rem;
@@ -298,17 +344,19 @@ onMounted(() => {
 .input-busqueda {
   width: 100%;
   padding: 0.5rem 2.2rem 0.5rem 2.4rem;
-  background: var(--color-fondo);
+  background: var(--surface);
   color: var(--color-texto);
-  border: 1px solid var(--color-borde-suave);
+  border: 1.5px solid var(--color-borde);
   border-radius: 6px;
+  font-family: var(--font-body);
   font-size: 0.9rem;
   outline: none;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .input-busqueda:focus {
   border-color: var(--color-acento);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .btn-limpiar {
@@ -325,7 +373,7 @@ onMounted(() => {
 }
 
 .btn-limpiar:hover {
-  color: var(--color-acento);
+  color: var(--color-acento-hover);
 }
 
 .resumen-contador {
@@ -334,7 +382,7 @@ onMounted(() => {
 }
 
 .tabla-contenedor {
-  background: var(--color-fondo-panel);
+  background: var(--surface);
   border: 1px solid var(--color-borde);
   border-radius: 10px;
   overflow-x: auto;
@@ -348,15 +396,16 @@ onMounted(() => {
 }
 
 .tabla-historial thead {
-  background: var(--color-fondo);
+  background: var(--ink);
   border-bottom: 2px solid var(--color-borde);
 }
 
 .tabla-historial th {
   padding: 0.85rem 1rem;
   text-align: left;
-  font-weight: 700;
-  color: var(--color-texto-suave);
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--surface);
   font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -369,8 +418,12 @@ onMounted(() => {
   color: var(--color-texto);
 }
 
+.tabla-historial tbody tr:nth-child(even) {
+  background: var(--bg);
+}
+
 .fila-comanda:hover {
-  background: var(--color-fondo-hover);
+  background: var(--color-fondo-hover) !important;
 }
 
 .col-icono {
@@ -388,6 +441,8 @@ onMounted(() => {
 }
 
 .nombre-archivo {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
   word-break: break-all;
 }
 
@@ -404,12 +459,12 @@ onMounted(() => {
 .badge-tamano {
   display: inline-block;
   padding: 0.2rem 0.55rem;
-  background: var(--color-fondo);
-  border: 1px solid var(--color-borde-suave);
+  background: var(--accent-soft);
+  border: 1px solid transparent;
   border-radius: 4px;
   font-size: 0.8rem;
-  color: var(--color-texto-suave);
-  font-family: monospace;
+  color: var(--accent-dark);
+  font-family: var(--font-mono);
 }
 
 .col-acciones {
@@ -422,6 +477,7 @@ onMounted(() => {
   gap: 0.35rem;
   padding: 0.4rem 0.75rem;
   border-radius: 6px;
+  font-family: var(--font-display);
   font-size: 0.82rem;
   font-weight: 600;
   text-decoration: none;
@@ -442,15 +498,15 @@ onMounted(() => {
 }
 
 .btn-descargar {
-  background: transparent;
+  background: var(--surface);
   border-color: var(--color-borde);
   color: var(--color-texto);
 }
 
 .btn-descargar:hover {
-  background: var(--color-fondo-panel);
+  background: var(--surface);
   border-color: var(--color-acento);
-  color: var(--color-acento);
+  color: var(--color-acento-hover);
 }
 
 .mensaje-estado,
@@ -462,57 +518,7 @@ onMounted(() => {
   justify-content: center;
   padding: 3.5rem 1.5rem;
   text-align: center;
-  background: var(--color-fondo-panel);
-  border: 1px solid var(--color-borde);
-  border-radius: 10px;
-  color: var(--color-texto-muted);
+  background: var(--surface);
+  border: 1.5px dashed var(--color-borde);
 }
-
-.mensaje-estado p {
-  margin-top: 1rem;
-  font-size: 0.95rem;
-}
-
-.mensaje-error {
-  border-color: #e57373;
-}
-
-.mensaje-error i {
-  font-size: 2.2rem;
-  color: #d32f2f;
-  margin-bottom: 0.5rem;
-}
-
-.mensaje-error p {
-  color: #d32f2f;
-  margin-bottom: 1rem;
-  font-weight: 600;
-}
-
-.btn-reintentar {
-  padding: 0.45rem 1rem;
-  background: var(--color-acento);
-  color: white;
-  border: 0;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.mensaje-vacio i {
-  font-size: 2.6rem;
-  color: var(--color-texto-muted);
-  margin-bottom: 0.6rem;
-}
-
-.mensaje-vacio h3 {
-  font-size: 1.15rem;
-  color: var(--color-texto);
-  margin: 0 0 0.3rem 0;
-}
-
-.mensaje-vacio p {
-  font-size: 0.9rem;
-  max-width: 420px;
-  margin: 0;
-}
-</style>
+</style>  
