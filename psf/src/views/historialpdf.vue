@@ -17,10 +17,13 @@ async function cargar() {
   error.value = ''
   try {
     const res = await fetch(`${API_URL}/comandas/pdfs`)
-    if (!res.ok) throw new Error()
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error(data.error || `Error ${res.status}: no se pudo cargar el historial`)
+    }
     pdfs.value = await res.json()
-  } catch {
-    error.value = 'No se pudo cargar el historial de comandas.'
+  } catch (err) {
+    error.value = err.message || 'No se pudo cargar el historial de comandas.'
   } finally {
     cargando.value = false
   }

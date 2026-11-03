@@ -243,6 +243,50 @@ app.get(['/comandas', '/api/comandas'], async (_req, res) => {
     }
 });
 
+// Listado de PDFs guardados (más recientes primero)
+// IMPORTANTE: Definir antes de /comandas/:id para evitar que Express interprete 'pdfs' como un :id
+app.get(['/comandas/pdfs', '/api/comandas/pdfs'], async (_req, res) => {
+    try {
+        await fs.mkdir(PDF_DIR, { recursive: true });
+        const archivos = await fs.readdir(PDF_DIR);
+        const stats = await Promise.all(
+            archivos
+                .filter((nombre) => nombre.toLowerCase().endsWith('.pdf'))
+                .map(async (nombre) => {
+                    try {
+                        const stat = await fs.stat(path.join(PDF_DIR, nombre));
+                        return { nombre, tamano: stat.size, fecha: stat.mtime.toISOString() };
+                    } catch {
+                        return null;
+                    }
+                })
+        );
+        const pdfs = stats.filter(Boolean);
+        pdfs.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        res.json(pdfs);
+    } catch (error) {
+        console.error('Error al listar los PDF:', error);
+        res.status(500).json({ error: 'Error al listar los PDF' });
+    }
+});
+
+// Ver un PDF puntual en el navegador
+app.get(['/comandas/pdfs/:nombre', '/api/comandas/pdfs/:nombre'], async (req, res) => {
+    const nombre = path.basename(req.params.nombre); // evita rutas tipo ../../
+    if (!nombre.toLowerCase().endsWith('.pdf')) {
+        return res.status(400).json({ error: 'Archivo inválido' });
+    }
+    const ruta = path.resolve(PDF_DIR, nombre);
+    try {
+        await fs.access(ruta);
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(nombre)}"`);
+        res.sendFile(ruta);
+    } catch {
+        res.status(404).json({ error: 'PDF no encontrado' });
+    }
+});
+
 app.get(['/comandas/:id', '/api/comandas/:id'], async (req, res) => {
     try {
         const { id } = req.params;
@@ -288,42 +332,7 @@ app.post(['/comandas/backup-pdf', '/api/comandas/backup-pdf'], upload.single('pd
     }
 });
 
-// Listado de PDFs guardados (más recientes primero)
-app.get(['/comandas/pdfs', '/api/comandas/pdfs'], async (_req, res) => {
-    try {
-        const archivos = await fs.readdir(PDF_DIR);
-        const pdfs = await Promise.all(
-            archivos
-                .filter((nombre) => nombre.toLowerCase().endsWith('.pdf'))
-                .map(async (nombre) => {
-                    const stat = await fs.stat(path.join(PDF_DIR, nombre));
-                    return { nombre, tamano: stat.size, fecha: stat.mtime.toISOString() };
-                })
-        );
-        pdfs.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-        res.json(pdfs);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al listar los PDF' });
-    }
-});
 
-// Ver un PDF puntual en el navegador
-app.get(['/comandas/pdfs/:nombre', '/api/comandas/pdfs/:nombre'], async (req, res) => {
-    const nombre = path.basename(req.params.nombre); // evita rutas tipo ../../
-    if (!nombre.toLowerCase().endsWith('.pdf')) {
-        return res.status(400).json({ error: 'Archivo inválido' });
-    }
-    const ruta = path.join(PDF_DIR, nombre);
-    try {
-        await fs.access(ruta);
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(nombre)}"`);
-        res.sendFile(ruta);
-    } catch {
-        res.status(404).json({ error: 'PDF no encontrado' });
-    }
-});
 
 // ==========================================
 // AUTO-IMPORTACIÓN Y ENDPOINT ADMINISTRATIVO
