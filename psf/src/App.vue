@@ -4,7 +4,6 @@
 import { onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import HistorialPdf from '@/components/HistorialPdf.vue'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -81,7 +80,6 @@ watch(modoOscuro, (activo) => {
     </header>
 
     <main class="app-content">
-      <HistorialPdf />
       <RouterView />
     </main>
   </div>
