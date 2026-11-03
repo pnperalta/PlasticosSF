@@ -3,6 +3,7 @@ import Comanda from '@/views/comanda.vue'
 import Produ from '@/views/produ.vue'
 import Clientes from '@/views/clientes.vue'
 import calculadora from '@/views/calculadora.vue'
+import historialpdf from '@/views/historialpdf.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       path: '/calcu',
       name: 'calcu',
       component: calculadora,
+    },
+    {
+      path: '/historial',
+      name: 'historial',
+      component: historialpdf,
     },
   ],
 })

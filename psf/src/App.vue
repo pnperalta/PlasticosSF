@@ -4,6 +4,7 @@
 import { onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import HistorialPdf from '@/components/HistorialPdf.vue'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -71,11 +72,16 @@ watch(modoOscuro, (activo) => {
           <i class="bi bi-calculator-fill"></i>
           <span>Calculadora</span>
         </RouterLink>
+        <RouterLink to="/historial" class="tab">
+          <i class="bi bi-clock-history"></i>
+          <span>Historial</span>
+        </RouterLink> 
       </nav>
 
     </header>
 
     <main class="app-content">
+      <HistorialPdf />
       <RouterView />
     </main>
   </div>
@@ -170,6 +176,7 @@ nav {
 .app-content {
   flex: 1;
   min-width: 0;
+  position: relative;
 }
 
 .app-layout.sin-sidebar {
