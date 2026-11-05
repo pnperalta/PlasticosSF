@@ -1,10 +1,11 @@
 <script setup>
 // node src/serverSQL.js
 
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { API_URL } from '@/config.js'
 
 const clientes = ref([])
+const mostrandoClientes = ref(false)
 const mostrandoFormulario = ref(false)
 const cargando = ref(false)
 const editandoCliente = ref(null) // guarda { codigoc, etiquetas } de la fila en edición
@@ -82,24 +83,11 @@ const nuevoCliente = reactive({
   vendedor: '',
 })
 
-async function cargarClientes() {
-  cargando.value = true
-
-  try {
-    const res = await fetch(`${API_URL}/clientes`)
-
-    if (!res.ok) throw new Error('Error al obtener los clientes')
-
-    clientes.value = await res.json()
-  } catch (err) {
-    console.error(err)
-    alert('Hubo un error al cargar los clientes.')
-  } finally {
-    cargando.value = false
+async function toggleMostrarClientes() {
+  if (mostrandoClientes.value) {
+    mostrandoClientes.value = false
+    return
   }
-}
-
-onMounted(cargarClientes)
 
   cargando.value = true
 
@@ -116,7 +104,7 @@ onMounted(cargarClientes)
   } finally {
     cargando.value = false
   }
-
+}
 
 function toggleFormulario() {
   mostrandoFormulario.value = !mostrandoFormulario.value
@@ -148,8 +136,10 @@ async function agregarCliente() {
     mostrandoFormulario.value = false
     alert('Cliente agregado correctamente.')
 
-    await cargarClientes() 
-
+    if (mostrandoClientes.value) {
+      await toggleMostrarClientes()
+      await toggleMostrarClientes()
+    }
   } catch (err) {
     console.error(err)
     alert('Hubo un error al agregar el cliente.')
@@ -165,11 +155,14 @@ async function agregarCliente() {
       <h1 class="titulo-principal" style="margin-top: 1%;">Clientes</h1>
     </header>
 
-   <div class="toolbar">
+    <div class="toolbar">
       <button class="btn btn-primary" @click="toggleFormulario">
         {{ mostrandoFormulario ? 'Cancelar' : '+ Agregar cliente' }}
       </button>
-   </div>
+      <button class="btn btn-outline" @click="toggleMostrarClientes">
+        {{ mostrandoClientes ? 'Ocultar clientes' : 'Mostrar clientes' }}
+      </button>
+    </div>
 
     <transition name="fade">
       <div v-if="mostrandoFormulario" class="card form-card">
@@ -213,21 +206,22 @@ async function agregarCliente() {
     <div class="panel">
       <p v-if="cargando" class="state-msg">Cargando…</p>
 
-      <div v-else>
+      <div v-else-if="mostrandoClientes">
         <div class="search-bar">
           <input type="text" v-model="busqueda" placeholder="Buscar..." class="search-input">
           <button v-if="busqueda" class="btn btn-sm btn-ghost" @click="busqueda = ''" type="button">
             Limpiar
           </button>
-      </div>
+        </div>
 
-      <div v-if="clientes.length === 0" class="empty-state">
-        <p>No hay clientes registrados todavía.</p>
-      </div>
+        <div v-if="clientes.length === 0" class="empty-state">
+          <p>No hay clientes registrados todavía.</p>
+        </div>
 
-      <div v-else-if="clientesFiltrados.length === 0" class="empty-state">
-        <p>No se encontraron clientes que coincidan con "{{ busqueda }}".</p>
-      </div>
+        <div v-else-if="clientesFiltrados.length === 0" class="empty-state">
+          <p>No se encontraron clientes que coincidan con "{{ busqueda }}".</p>
+        </div>
+
         <div v-else class="card table-wrap">
           <table>
             <thead>
@@ -268,6 +262,10 @@ async function agregarCliente() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div v-else class="empty-state">
+        <p>Presioná "Mostrar clientes" para ver la lista.</p>
       </div>
     </div>
   </div>
