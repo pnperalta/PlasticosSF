@@ -1,28 +1,33 @@
 <script setup>
 // node src/serverSQL.js
 
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { API_URL } from '@/config.js'
 
 const clientes = ref([])
-const mostrandoClientes = ref(false)
 const mostrandoFormulario = ref(false)
-const cargando = ref(false)
+const cargando = ref(false)        // para guardar / editar / agregar
+const cargandoLista = ref(false)   // solo para la carga de la tabla
 const editandoCliente = ref(null) // guarda { codigoc, etiquetas } de la fila en edición
 const edicionCliente = reactive({ razonsocial: '', vendedor: '', etiquetas: '' })
 const busqueda = ref('')
 
+// Saca tildes y pasa a minúsculas para comparar
+function normalizar(texto) {
+  return String(texto ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+}
+
 const clientesFiltrados = computed(() => {
-  const termino = busqueda.value.trim().toLowerCase()
-  if (!termino) return clientes.value
+  const terminos = normalizar(busqueda.value).split(/\s+/).filter(Boolean)
+  if (!terminos.length) return clientes.value
 
   return clientes.value.filter(c => {
-    return (
-      String(c.codigoc ?? '').toLowerCase().includes(termino) ||
-      String(c.razonsocial ?? '').toLowerCase().includes(termino) ||
-      String(c.etiquetas ?? '').toLowerCase().includes(termino) ||
-      String(c.vendedor ?? '').toLowerCase().includes(termino)
-    )
+    const texto = normalizar(`${c.codigoc} ${c.razonsocial} ${c.etiquetas} ${c.vendedor}`)
+    // todas las palabras tienen que aparecer, en cualquier campo y en cualquier orden
+    return terminos.every(t => texto.includes(t))
   })
 })
 
@@ -83,13 +88,8 @@ const nuevoCliente = reactive({
   vendedor: '',
 })
 
-async function toggleMostrarClientes() {
-  if (mostrandoClientes.value) {
-    mostrandoClientes.value = false
-    return
-  }
-
-  cargando.value = true
+async function cargarClientes() {
+  cargandoLista.value = true
 
   try {
     const res = await fetch(`${API_URL}/clientes`)
@@ -97,14 +97,15 @@ async function toggleMostrarClientes() {
     if (!res.ok) throw new Error('Error al obtener los clientes')
 
     clientes.value = await res.json()
-    mostrandoClientes.value = true
   } catch (err) {
     console.error(err)
     alert('Hubo un error al cargar los clientes.')
   } finally {
-    cargando.value = false
+    cargandoLista.value = false
   }
 }
+
+onMounted(cargarClientes)
 
 function toggleFormulario() {
   mostrandoFormulario.value = !mostrandoFormulario.value
@@ -136,10 +137,7 @@ async function agregarCliente() {
     mostrandoFormulario.value = false
     alert('Cliente agregado correctamente.')
 
-    if (mostrandoClientes.value) {
-      await toggleMostrarClientes()
-      await toggleMostrarClientes()
-    }
+    await cargarClientes()
   } catch (err) {
     console.error(err)
     alert('Hubo un error al agregar el cliente.')
@@ -158,9 +156,6 @@ async function agregarCliente() {
     <div class="toolbar">
       <button class="btn btn-primary" @click="toggleFormulario">
         {{ mostrandoFormulario ? 'Cancelar' : '+ Agregar cliente' }}
-      </button>
-      <button class="btn btn-outline" @click="toggleMostrarClientes">
-        {{ mostrandoClientes ? 'Ocultar clientes' : 'Mostrar clientes' }}
       </button>
     </div>
 
@@ -204,16 +199,17 @@ async function agregarCliente() {
     </transition>
 
     <div class="panel">
-      <p v-if="cargando" class="state-msg">Cargando…</p>
+      <!-- El buscador queda fuera del estado "Cargando…" para no perder el foco -->
+      <div class="search-bar">
+        <input type="text" v-model="busqueda" placeholder="Buscar..." class="search-input">
+        <button v-if="busqueda" class="btn btn-sm btn-ghost" @click="busqueda = ''" type="button">
+          Limpiar
+        </button>
+      </div>
 
-      <div v-else-if="mostrandoClientes">
-        <div class="search-bar">
-          <input type="text" v-model="busqueda" placeholder="Buscar..." class="search-input">
-          <button v-if="busqueda" class="btn btn-sm btn-ghost" @click="busqueda = ''" type="button">
-            Limpiar
-          </button>
-        </div>
+      <p v-if="cargandoLista" class="state-msg">Cargando…</p>
 
+      <div v-else>
         <div v-if="clientes.length === 0" class="empty-state">
           <p>No hay clientes registrados todavía.</p>
         </div>
@@ -245,8 +241,8 @@ async function agregarCliente() {
             <td><input type="text" :value="edicionCliente.vendedor"
               @input="edicionCliente.vendedor = $event.target.value.toUpperCase()"></td>
             <td class="actions-cell">
-              <button @click="guardarEdicionCliente" class="btn btn-sm btn-primary">Guardar</button>
-              <button @click="cancelarEdicionCliente" class="btn btn-sm btn-ghost">Cancelar</button>
+              <button @click="guardarEdicionCliente" class="btn btn-sm btn-primary" :disabled="cargando">Guardar</button>
+              <button @click="cancelarEdicionCliente" class="btn btn-sm btn-ghost" :disabled="cargando">Cancelar</button>
             </td>
           </template>
 
@@ -262,10 +258,6 @@ async function agregarCliente() {
             </tbody>
           </table>
         </div>
-      </div>
-
-      <div v-else class="empty-state">
-        <p>Presioná "Mostrar clientes" para ver la lista.</p>
       </div>
     </div>
   </div>
@@ -677,7 +669,8 @@ td input {
 }
 
 .search-input {
-  width: 50%;
-  justify-self: center;
+  width: auto;
+  flex: 1;
+  max-width: 400px;
 }
 </style>
