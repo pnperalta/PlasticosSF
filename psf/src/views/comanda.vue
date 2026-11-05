@@ -80,6 +80,14 @@ async function buscarCliente() {
     const filas = await res.json()
     clienteInfo.opciones = filas
 
+    // El nombre es el mismo para todas las etiquetas del cliente,
+    // así que lo cargamos siempre, haya una o varias etiquetas.
+    if (filas.length > 0) {
+      comanda.razonSocial = filas[0].razonsocial
+    }
+
+    // Si hay una sola etiqueta, la seleccionamos sola
+    // (esto completa también vendedor y etiqueta).
     if (filas.length === 1) {
       seleccionarEtiqueta(filas[0].etiquetas)
     }
@@ -802,6 +810,10 @@ function irCampoSiguiente(event) {
               @keyup.enter="manejarEnterCodigoCliente"
           >
         </div>
+         <div class="field">
+            <label for="cliente">Nombre del cliente</label>
+            <input type="text" id="cliente" name="cliente" v-model="comanda.razonSocial" @keyup.enter="irCampoSiguiente" >
+        </div>
 
         <div class="field" style="grid-column: 1 / -1;" v-if="clienteInfo.opciones.length > 1">
           <label for="etiqueta-select">Este cliente tiene varias etiquetas — elegí una</label>
@@ -813,7 +825,7 @@ function irCampoSiguiente(event) {
           >
             <option disabled value="">Elegí una etiqueta</option>
             <option v-for="c in clienteInfo.opciones" :key="c.etiquetas" :value="c.etiquetas">
-              {{ c.etiquetas }} — {{ c.razonsocial }}
+              {{ c.etiquetas }}
             </option>
           </select>
         </div>
