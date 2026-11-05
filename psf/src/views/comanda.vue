@@ -711,7 +711,7 @@ async function generarPdfBlob() {
 }
 
 async function guardarPdfComanda(blobPdf) {
-  const nombreArchivo = `comanda-${comanda.numero || 'sin-numero'}.pdf`
+  const nombreArchivo = `comanda-${comanda.numero || 'sin-numero'}-${comanda.codigoCliente}.pdf`
   const formData = new FormData()
   formData.append('pdf', blobPdf, nombreArchivo)
 
