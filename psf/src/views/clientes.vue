@@ -106,10 +106,10 @@ async function toggleMostrarClientes() {
     mostrandoClientes.value = false
     return
   }
-  await agregarCliente()
+  await cargarClientes()
 }
 
-onMounted(agregarCliente)
+onMounted(cargarClientes)
 
 function toggleFormulario() {
   mostrandoFormulario.value = !mostrandoFormulario.value
@@ -141,7 +141,7 @@ async function agregarCliente() {
     mostrandoFormulario.value = false
     alert('Cliente agregado correctamente.')
 
-    await agregarCliente()
+    await cargarClientes()
 
     if (mostrandoClientes.value) {
       await toggleMostrarClientes()
