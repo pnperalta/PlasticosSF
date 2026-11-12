@@ -3,6 +3,8 @@
 
 import { ref, reactive, computed } from 'vue'
 import { API_URL } from '@/config.js'
+import { watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 const clientes = ref([])
 const mostrandoClientes = ref(false)
@@ -11,6 +13,9 @@ const cargando = ref(false)
 const editandoCliente = ref(null) // guarda { codigoc, etiquetas } de la fila en edición
 const edicionCliente = reactive({ razonsocial: '', vendedor: '', etiquetas: '' })
 const busqueda = ref('')
+const route = useRoute()
+
+watch(() => route.path, mostrandoClientes, { immediate: true })
 
 const clientesFiltrados = computed(() => {
   const termino = busqueda.value.trim().toLowerCase()
