@@ -1,7 +1,7 @@
 <script setup>
 // node src/serverSQL.js
 
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { API_URL } from '@/config.js'
  
 const productos = ref([])
@@ -72,12 +72,7 @@ const nuevoProducto = reactive({
   peso: ''
 })
 
-async function toggleMostrarProductos() {
-  if (mostrandoProductos.value) {
-    mostrandoProductos.value = false
-    return
-  }
-
+async function cargarProductos() {
   cargando.value = true
 
   try {
@@ -94,6 +89,16 @@ async function toggleMostrarProductos() {
     cargando.value = false
   }
 }
+
+async function toggleMostrarProductos() {
+  if (mostrandoProductos.value) {
+    mostrandoProductos.value = false
+    return
+  }
+  await cargarProductos()
+}
+
+onMounted(cargarProductos)
 
 function toggleFormulario() {
   mostrandoFormulario.value = !mostrandoFormulario.value
@@ -125,6 +130,8 @@ async function agregarProducto() {
 
     mostrandoFormulario.value = false
     alert('Producto agregado correctamente.')
+
+    await cargarProductos()
 
     if (mostrandoProductos.value) {
       await toggleMostrarProductos()
