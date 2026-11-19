@@ -4,6 +4,8 @@
 import { onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import logoClaro from './assets/logopsf.png'
+import logoOscuro from './assets/logopsf-oscuro.png'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -39,7 +41,7 @@ watch(modoOscuro, (activo) => {
 
   <div class="app-layout" :class="{ 'sin-sidebar': !auth.isAuthenticated }">
     <header class="no-print">
-      <img alt="Vue logo" src="./assets/logopsf.png"/>
+      <img alt="PSF" :src="modoOscuro ? logoOscuro : logoClaro" />
       <div class="modo_osc_cla">
         <i
           class="bi bi-brightness-high-fill"
